@@ -1,8 +1,6 @@
 package lexer
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestInputLexer(t *testing.T) {
 	testInput := `if true
