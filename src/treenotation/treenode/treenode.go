@@ -1,6 +1,6 @@
 package treenode
 
-// TreeNode defines the core building block
+// TreeNode defines the core building block: a string value, and list of children
 type TreeNode struct {
 	Value    string
 	Children []*TreeNode
