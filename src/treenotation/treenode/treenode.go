@@ -2,9 +2,8 @@ package treenode
 
 // TreeNode defines the core building block
 type TreeNode struct {
-	Parent   *TreeNode
+	Value    string
 	Children []*TreeNode
-	Line     string
 }
 
 const (
