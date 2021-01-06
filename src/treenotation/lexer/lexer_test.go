@@ -8,13 +8,17 @@ func TestInputLexer(t *testing.T) {
 	testInput := `html
   body
     div おはようございます
-    div good morning`
+      span "language: ja"
+    div good morning
+      span "language: en"`
 
 	testNodeValues := []string{
 		"html",
 		"body",
 		"div おはようございます",
 		"div good morning",
+		"span \"language: ja\"",
+		"span \"language: en\"",
 	}
 	expected := len(testNodeValues)
 
