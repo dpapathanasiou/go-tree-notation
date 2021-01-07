@@ -8,22 +8,19 @@ func TestInputLexer(t *testing.T) {
 	testInput := `html
   body
     div おはようございます
-      span "language: ja"
-    div good morning
-      span "language: en"`
+    div good morning`
 
 	testNodeValues := []string{
 		"html",
 		"body",
 		"div おはようございます",
 		"div good morning",
-		"span \"language: ja\"",
-		"span \"language: en\"",
 	}
 	expected := len(testNodeValues)
 
 	l := NewLexer(testInput)
-	parsedNodeValues := Traverse(l.GetTreeNode(), nil)
+	tree := l.GetTreeNode()
+	parsedNodeValues := Traverse(tree, nil)
 
 	if expected != len(parsedNodeValues) {
 		t.Fatalf("node count test failed: expected=%d, actual=%d", expected, len(parsedNodeValues))
@@ -32,8 +29,7 @@ func TestInputLexer(t *testing.T) {
 	for i, testOutput := range testNodeValues {
 		node := parsedNodeValues[i]
 		if node != testOutput {
-			t.Fatalf("tests[%d] failed: expected=%s, actual=%s", i, testOutput, node)
+			t.Fatalf("node tests[%d] failed: expected=%s, actual=%s", i, testOutput, node)
 		}
 	}
-
 }
