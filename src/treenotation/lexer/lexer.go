@@ -1,7 +1,6 @@
 package lexer
 
 import (
-	"sort"
 	"strings"
 	"treenotation/treenode"
 )
@@ -33,47 +32,62 @@ func Traverse(tree *treenode.TreeNode, nodes []string) []string {
 	return nodes
 }
 
-// groupByIndent groups the node strings by indent level, returning them in a map whose key is the indention count
-func groupByIndent(nodes []string) map[int][]string {
-	var m = make(map[int][]string)
-	for _, node := range nodes {
-		indents := 0
-		for _, word := range strings.Split(node, treenode.EdgeSymbol) {
-			if word != "" {
-				break
-			}
-			indents++
+func getIndentation(node string) int {
+	indent := 0
+	for _, word := range strings.Split(node, treenode.EdgeSymbol) {
+		if word != "" {
+			break
 		}
-		m[indents] = append(m[indents], strings.TrimLeft(node, treenode.EdgeSymbol))
+		indent++
 	}
-	return m
+	return indent
 }
 
-// generateTreeNodes uses groupByIndent to convert the list node strings into the treenode, from the root down
+// generateTreeNodes converts the list node of strings into the treenode, from the root down
 func generateTreeNodes(nodes []string) *treenode.TreeNode {
-	grouped := groupByIndent(nodes)
-
-	// get the keys (indent levels) and sort them by ascending order
-	keys := make([]int, 0, len(grouped))
-	for k := range grouped {
-		keys = append(keys, k)
-	}
-	sort.Ints(keys)
-
-	var root *treenode.TreeNode
-	for _, indent := range keys {
-		for _, node := range grouped[indent] {
-			root = addToTree(root, node)
+	var tree *treenode.TreeNode
+	// track the parent/child relations with a stack:
+	// indent (new child) -> push
+	// outdent or peer    <- pop
+	stack := []*treenode.TreeNode{}
+	for _, node := range nodes {
+		if tree == nil {
+			tree = &treenode.TreeNode{Value: node}
+			stack = append(stack, tree)
+		} else {
+			treeIndent := getIndentation(tree.Value)
+			nodeIndent := getIndentation(node)
+			if nodeIndent > treeIndent {
+				// new child
+				child := &treenode.TreeNode{Value: node, Parent: tree}
+				tree.Children = append(tree.Children, child)
+				stack = append(stack, child)
+			} else if nodeIndent == treeIndent {
+				// new peer child
+				for len(stack) > 0 && nodeIndent == getIndentation(tree.Value) {
+					tree = stack[len(stack)-1]
+					stack = stack[:len(stack)-1]
+				}
+				child := &treenode.TreeNode{Value: node, Parent: tree}
+				tree.Children = append(tree.Children, child)
+				stack = append(stack, child)
+			} else if nodeIndent < treeIndent {
+				// new parent (child of prior parent)
+				for len(stack) > 0 && nodeIndent < getIndentation(tree.Value) {
+					tree = stack[len(stack)-1]
+					stack = stack[:len(stack)-1]
+				}
+				child := &treenode.TreeNode{Value: node, Parent: tree}
+				tree.Children = append(tree.Children, child)
+				stack = append(stack, child)
+			}
+			tree = stack[len(stack)-1]
 		}
 	}
-	return root
-}
 
-// addToTree recursively creates or appends children to the tree
-func addToTree(tree *treenode.TreeNode, node string) *treenode.TreeNode {
-	if tree == nil {
-		return &treenode.TreeNode{Value: node}
+	// return the root
+	for tree.Parent != nil {
+		tree = tree.Parent
 	}
-	tree.Children = append(tree.Children, addToTree(nil, node))
 	return tree
 }

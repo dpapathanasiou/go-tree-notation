@@ -6,15 +6,21 @@ import (
 
 func TestInputLexer(t *testing.T) {
 	testInput := `html
+  header
+    css my stylesheet
+    js my javascript
   body
     div おはようございます
     div good morning`
 
 	testNodeValues := []string{
 		"html",
-		"body",
-		"div おはようございます",
-		"div good morning",
+		"  header",
+		"    css my stylesheet",
+		"    js my javascript",
+		"  body",
+		"    div おはようございます",
+		"    div good morning",
 	}
 	expected := len(testNodeValues)
 
