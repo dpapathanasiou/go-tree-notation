@@ -32,6 +32,7 @@ func Traverse(tree *treenode.TreeNode, nodes []string) []string {
 	return nodes
 }
 
+// getIndentation counts the number of EdgeSymbol bytes found on the left side of this node string
 func getIndentation(node string) int {
 	indent := 0
 	for _, word := range strings.Split(node, treenode.EdgeSymbol) {
@@ -43,7 +44,7 @@ func getIndentation(node string) int {
 	return indent
 }
 
-// generateTreeNodes converts the list node of strings into the treenode, from the root down
+// generateTreeNodes converts the list node of strings into the TreeNode, from the root down
 func generateTreeNodes(nodes []string) *treenode.TreeNode {
 	var tree *treenode.TreeNode
 	// track the parent/child relations with a stack:
@@ -85,7 +86,7 @@ func generateTreeNodes(nodes []string) *treenode.TreeNode {
 		}
 	}
 
-	// return the root
+	// return the root TreeNode
 	for tree.Parent != nil {
 		tree = tree.Parent
 	}
